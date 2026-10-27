@@ -1,20 +1,553 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino Lab | Aprende desde cero</title>
+
+<style>
+:root {
+  --fondo: #090912;
+  --panel: #151527;
+  --borde: #302b49;
+  --texto: #f4f3ff;
+  --gris: #aaa9c4;
+  --naranja: #ff8a24;
+  --violeta: #b56bff;
+  --cian: #46e7f5;
+  --verde: #67f5b4;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top right,#25103b,transparent 40%),var(--fondo);
+  color: var(--texto);
+  font: 16px/1.6 system-ui,Arial,sans-serif;
+}
+a { color: var(--cian); }
+button,input,select { font: inherit; }
+button { cursor: pointer; }
+.contenedor { width: min(1150px,92%); margin: auto; }
+header {
+  position: sticky; top: 0; z-index: 5;
+  background: #090912ed; border-bottom: 1px solid var(--borde);
+  backdrop-filter: blur(12px);
+}
+nav { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:15px 0; }
+.logo { font-weight:900; letter-spacing:2px; }
+.logo span,.naranja { color:var(--naranja); }
+.violeta { color:var(--violeta); }
+.enlaces { display:flex; gap:15px; flex-wrap:wrap; }
+.enlaces a { text-decoration:none; color:var(--gris); }
+.enlaces a:hover { color:var(--cian); }
+.hero {
+  display:grid; grid-template-columns:1fr 1fr; align-items:center;
+  gap:35px; padding:65px 0 35px;
+}
+.etiqueta { color:var(--cian); text-transform:uppercase; letter-spacing:3px; font-size:.8rem; font-weight:bold; }
+h1 { font-size:clamp(2.5rem,6vw,4.6rem); line-height:1.05; margin:15px 0; }
+p { color:var(--gris); }
+.boton {
+  display:inline-block; padding:10px 16px; margin:5px 5px 5px 0;
+  border:1px solid var(--borde); border-radius:10px;
+  background:var(--panel); color:var(--texto); text-decoration:none;
+}
+.boton.principal { background:var(--naranja); color:#180e20; font-weight:bold; }
+.boton:hover { box-shadow:0 0 18px #b56bff55; }
+.imagen,.panel {
+  background:linear-gradient(145deg,#19172d,#10101a);
+  border:1px solid var(--borde); border-radius:18px; padding:18px;
+}
+.imagen img { display:block; width:100%; max-height:330px; object-fit:contain; }
+.centrado { text-align:center; font-size:.8rem; }
+.estadisticas,.rejilla,.dos,.lecciones,.fuentes {
+  display:grid; gap:14px;
+}
+.estadisticas { grid-template-columns:repeat(4,1fr); margin:15px 0 35px; }
+.estadistica { background:var(--panel); padding:16px; border:1px solid var(--borde); border-radius:13px; }
+.estadistica strong { display:block; color:var(--naranja); font-size:1.6rem; }
+.estadistica span { color:var(--gris); font-size:.9rem; }
+section { padding:35px 0; scroll-margin-top:80px; }
+h2 { font-size:clamp(1.7rem,4vw,2.5rem); line-height:1.2; }
+h3 { color:var(--violeta); }
+.dos { grid-template-columns:1.1fr .9fr; align-items:start; }
+.rejilla { grid-template-columns:repeat(3,1fr); }
+.tarjeta {
+  padding:16px; text-align:left; color:var(--texto);
+  background:var(--panel); border:1px solid var(--borde); border-radius:13px;
+}
+.tarjeta:hover,.tarjeta.activa { border-color:var(--naranja); box-shadow:0 0 15px #ff8a2422; }
+.tarjeta h3 { margin:5px 0; }
+.tarjeta p { margin:0; font-size:.9rem; }
+.simbolo { font-size:1.5rem; }
+.botones-componentes { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+.chip {
+  background:#191629; color:var(--texto); border:1px solid var(--borde);
+  border-radius:20px; padding:8px 12px;
+}
+.chip:hover,.chip.activa { border-color:var(--violeta); background:#352047; }
+.detalle { min-height:300px; }
+.detalle h3 { color:var(--naranja); font-size:1.5rem; }
+.detalle li { color:#d0cde2; margin:8px 0; }
+.aviso { background:#261b14; border-left:3px solid var(--naranja); padding:12px; }
+.busqueda { display:flex; flex-wrap:wrap; gap:10px; margin:15px 0; }
+.busqueda input,.busqueda select {
+  flex:1; min-width:180px; padding:11px; color:var(--texto);
+  background:#10101a; border:1px solid var(--borde); border-radius:10px;
+}
+.pin { padding:12px; border:1px solid var(--borde); border-radius:10px; background:#0e0e19; }
+.pin b { color:var(--cian); }
+.pin span { display:block; color:var(--gris); font-size:.9rem; }
+.pin-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; }
+.codigo { background:#07070d; border:1px solid var(--borde); border-radius:12px; overflow:hidden; }
+.codigo-cabecera { padding:10px; display:flex; justify-content:space-between; gap:10px; border-bottom:1px solid var(--borde); }
+.codigo pre { padding:16px; overflow:auto; color:#e7dcff; font:14px/1.6 monospace; }
+.copiar { background:#302044; color:white; border:1px solid #58416c; border-radius:7px; padding:6px 10px; }
+.lecciones { grid-template-columns:repeat(3,1fr); }
+.leccion { padding:17px; background:var(--panel); border:1px solid var(--borde); border-radius:13px; }
+.leccion b { color:var(--naranja); font-size:1.3rem; }
+.fuentes { grid-template-columns:repeat(2,1fr); }
+.fuente { padding:15px; background:var(--panel); border:1px solid var(--borde); border-radius:12px; }
+.fuente a { font-weight:bold; }
+footer { border-top:1px solid var(--borde); padding:25px 0; color:var(--gris); }
+@media(max-width:800px) {
+  .hero,.dos { grid-template-columns:1fr; }
+  .rejilla,.lecciones { grid-template-columns:repeat(2,1fr); }
+  .estadisticas { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:520px) {
+  nav { align-items:flex-start; flex-direction:column; }
+  .rejilla,.lecciones,.fuentes { grid-template-columns:1fr; }
+  .pin-grid { grid-template-columns:1fr; }
+}
+</style>
 </head>
+
 <body>
-    <p style="color : purple">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
-    <p style = "color : orange">Jennifer</p>
+<header>
+  <nav class="contenedor">
+    <div class="logo">ARDUINO <span>LAB_</span></div>
+    <div class="enlaces">
+      <a href="#explorador">Placa</a>
+      <a href="#componentes">Componentes</a>
+      <a href="#pines">Pines</a>
+      <a href="#practicas">Prácticas</a>
+      <a href="#fuentes">Fuentes</a>
+    </div>
+  </nav>
+</header>
+
+<main class="contenedor">
+<section class="hero">
+  <div>
+    <div class="etiqueta">Electrónica + programación</div>
+    <h1>Tu primer paso al <span class="naranja">hardware</span> <span class="violeta">inteligente.</span></h1>
+    <p>Aprende Arduino UNO R3 desde cero. Explora sus componentes, conoce los pines y practica con programas que puedes copiar.</p>
+    <a class="boton principal" href="#explorador">Explorar la placa ↓</a>
+    <a class="boton" href="#primerproyecto">Mi primer LED</a>
+  </div>
+  <div class="imagen">
+    <img src="https://store.arduino.cc/cdn/shop/products/A000066_03.front_1000x750.jpg"
+         alt="Arduino UNO R3"
+         onerror="this.onerror=null;this.src='https://docs.arduino.cc/static/9f5b5c6b4a8fcaed6c9a6c8c0b9b4f42/29114/UNO-TH.webp'">
+    <p class="centrado">Arduino UNO R3 · Imagen del fabricante</p>
+  </div>
+</section>
+
+<div class="estadisticas">
+  <div class="estadistica"><strong>14</strong><span>Pines digitales</span></div>
+  <div class="estadistica"><strong>6</strong><span>Entradas analógicas</span></div>
+  <div class="estadistica"><strong>5 V</strong><span>Voltaje lógico</span></div>
+  <div class="estadistica"><strong>16 MHz</strong><span>Frecuencia de reloj</span></div>
+</div>
+
+<section id="explorador">
+  <div class="etiqueta">01 / Mapa interactivo</div>
+  <h2>Explora cada <span class="naranja">componente</span></h2>
+  <p>Selecciona el nombre de un componente para consultar su función y recomendaciones.</p>
+  <div class="dos">
+    <div class="imagen">
+      <img src="https://store.arduino.cc/cdn/shop/products/A000066_03.front_1000x750.jpg"
+           alt="Vista de la placa Arduino UNO R3">
+      <div class="botones-componentes" id="botonesPlaca"></div>
+      <p class="centrado">Los botones identifican las partes por nombre; consulta también el diagrama oficial de pines.</p>
+    </div>
+    <article class="panel detalle" id="detalle" aria-live="polite"></article>
+  </div>
+</section>
+
+<section id="componentes">
+  <div class="etiqueta">02 / Biblioteca</div>
+  <h2>Guía de <span class="violeta">componentes</span></h2>
+  <p>Busca un componente o filtra la lista por categoría.</p>
+  <div class="busqueda">
+    <input id="buscar" type="search" placeholder="Buscar: USB, PWM, reset..." aria-label="Buscar componentes">
+    <select id="filtro" aria-label="Filtrar por categoría">
+      <option value="todos">Todas las categorías</option>
+      <option value="control">Control</option>
+      <option value="conexiones">Conexiones</option>
+      <option value="energia">Energía</option>
+      <option value="comunicacion">Comunicación</option>
+      <option value="indicadores">Indicadores</option>
+    </select>
+  </div>
+  <div class="rejilla" id="listaComponentes"></div>
+</section>
+
+<section id="pines">
+  <div class="etiqueta">03 / Conexiones</div>
+  <h2>Entiende los <span class="naranja">pines</span></h2>
+  <p>Los pines permiten recibir señales de sensores y controlar dispositivos externos.</p>
+  <div class="dos">
+    <article class="panel">
+      <h3>Pines digitales · 0 a 13</h3>
+      <p>Se configuran como entradas o salidas y trabajan con estados HIGH y LOW.</p>
+      <div class="pin-grid">
+        <div class="pin"><b>0 (RX) y 1 (TX)</b><span>Comunicación serie. Pueden interferir con la carga del programa.</span></div>
+        <div class="pin"><b>2 y 3</b><span>Pines digitales que también admiten interrupciones externas.</span></div>
+        <div class="pin"><b>3, 5, 6, 9, 10, 11 (~)</b><span>Salidas PWM para regular, por ejemplo, el brillo de un LED.</span></div>
+        <div class="pin"><b>13</b><span>Conectado al LED integrado marcado L.</span></div>
+      </div>
+    </article>
+    <article class="panel">
+      <h3>Entradas analógicas · A0 a A5</h3>
+      <p>El convertidor analógico-digital de 10 bits transforma las mediciones en números.</p>
+      <div class="pin-grid">
+        <div class="pin"><b>A0–A5</b><span>Se leen con analogRead(); normalmente devuelve 0–1023.</span></div>
+        <div class="pin"><b>A4 / SDA</b><span>Línea de datos para el bus de comunicación I²C.</span></div>
+        <div class="pin"><b>A5 / SCL</b><span>Línea de reloj para el bus I²C.</span></div>
+        <div class="pin"><b>AREF</b><span>Referencia analógica externa; úsala solo con un circuito adecuado.</span></div>
+      </div>
+    </article>
+    <article class="panel">
+      <h3>Alimentación y tierra</h3>
+      <div class="pin-grid">
+        <div class="pin"><b>5V</b><span>Alimentación para módulos compatibles.</span></div>
+        <div class="pin"><b>3.3V</b><span>Salida de 3.3 V con corriente limitada.</span></div>
+        <div class="pin"><b>GND</b><span>Tierra o referencia común del circuito.</span></div>
+        <div class="pin"><b>VIN</b><span>Entrada para alimentación externa compatible.</span></div>
+        <div class="pin"><b>IOREF</b><span>Indica el nivel lógico de la placa a shields compatibles.</span></div>
+        <div class="pin"><b>RESET</b><span>Reinicia el microcontrolador al activarse.</span></div>
+      </div>
+    </article>
+    <article class="panel">
+      <h3>Comunicación y señales</h3>
+      <ul>
+        <li><b>UART:</b> serie mediante RX y TX.</li>
+        <li><b>I²C:</b> SDA y SCL; común en sensores y pantallas.</li>
+        <li><b>SPI:</b> comunicación mediante pines SPI y conector ICSP.</li>
+        <li><b>PWM:</b> señal digital modulada; no es una salida analógica real.</li>
+      </ul>
+      <div class="aviso">No conectes motores directamente a los pines. Utiliza un controlador de motor y una fuente adecuada.</div>
+    </article>
+  </div>
+</section>
+
+<section id="primerproyecto">
+  <div class="etiqueta">04 / Primera práctica</div>
+  <h2>Haz parpadear un <span class="naranja">LED</span></h2>
+  <div class="dos">
+    <article class="panel">
+      <h3>Materiales</h3>
+      <ul>
+        <li>Arduino UNO R3.</li>
+        <li>Cable USB que permita transferir datos.</li>
+        <li>Arduino IDE instalado.</li>
+        <li>Opcional: LED externo, resistencia de 220–330 Ω y cables.</li>
+      </ul>
+      <h3>Pasos</h3>
+      <ol>
+        <li>Conecta la placa a la computadora por USB.</li>
+        <li>Abre Arduino IDE y selecciona Arduino UNO y el puerto correcto.</li>
+        <li>Pega el programa de ejemplo.</li>
+        <li>Pulsa Verificar y después Subir.</li>
+        <li>El LED integrado debería parpadear una vez por segundo.</li>
+      </ol>
+      <p>Este ejemplo utiliza el LED integrado, por lo que no necesitas un LED externo.</p>
+    </article>
+    <div class="codigo">
+      <div class="codigo-cabecera">
+        <span>blink.ino · Arduino C/C++</span>
+        <button class="copiar" data-copiar="codigoBlink">Copiar código</button>
+      </div>
+      <pre id="codigoBlink">void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
+
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+}</pre>
+    </div>
+  </div>
+</section>
+
+<section id="practicas">
+  <div class="etiqueta">05 / Ruta para principiantes</div>
+  <h2>Qué aprender <span class="violeta">después</span></h2>
+  <div class="lecciones">
+    <article class="leccion"><b>01</b><h3>Entradas y salidas</h3><p>Practica pinMode(), digitalRead() y digitalWrite() con botones y LEDs.</p></article>
+    <article class="leccion"><b>02</b><h3>Lecturas analógicas</h3><p>Lee un potenciómetro o sensor de luz con analogRead().</p></article>
+    <article class="leccion"><b>03</b><h3>Señales PWM</h3><p>Controla el brillo de un LED con analogWrite() en un pin compatible.</p></article>
+    <article class="leccion"><b>04</b><h3>Sensores</h3><p>Prueba sensores de temperatura, distancia o movimiento.</p></article>
+    <article class="leccion"><b>05</b><h3>Actuadores</h3><p>Controla servomotores, relés y motores mediante módulos adecuados.</p></article>
+    <article class="leccion"><b>06</b><h3>Proyectos completos</h3><p>Construye una alarma, estación ambiental, riego automático o robot sencillo.</p></article>
+  </div>
+</section>
+
+<section>
+  <div class="etiqueta">06 / Comprueba lo aprendido</div>
+  <h2>Mini <span class="naranja">quiz</span></h2>
+  <div class="panel">
+    <h3>¿Cuál es la función principal del microcontrolador?</h3>
+    <form id="quiz">
+      <label><input type="radio" name="respuesta" value="a"> Alimentar todos los dispositivos sin límite.</label><br>
+      <label><input type="radio" name="respuesta" value="b"> Ejecutar el programa y procesar entradas para controlar salidas.</label><br>
+      <label><input type="radio" name="respuesta" value="c"> Crear una conexión Wi-Fi por sí solo.</label><br><br>
+      <button class="boton principal">Comprobar respuesta</button>
+    </form>
+    <p id="resultado" aria-live="polite"></p>
+  </div>
+</section>
+
+<section id="fuentes">
+  <div class="etiqueta">07 / Referencias</div>
+  <h2>Fuentes <span class="violeta">oficiales</span></h2>
+  <p>Consulta la documentación del fabricante para verificar especificaciones, diagramas y ejemplos.</p>
+  <div class="fuentes">
+    <article class="fuente">
+      <a href="https://docs.arduino.cc/hardware/uno-rev3/" target="_blank" rel="noopener noreferrer">Arduino UNO Rev3 ↗</a>
+      <p>Descripción de la placa y especificaciones técnicas.</p>
+    </article>
+    <article class="fuente">
+      <a href="https://docs.arduino.cc/software/ide/" target="_blank" rel="noopener noreferrer">Arduino IDE ↗</a>
+      <p>Información sobre el entorno para escribir y cargar programas.</p>
+    </article>
+    <article class="fuente">
+      <a href="https://docs.arduino.cc/built-in-examples/" target="_blank" rel="noopener noreferrer">Ejemplos integrados ↗</a>
+      <p>Ejemplos de entradas, salidas, comunicación y temporización.</p>
+    </article>
+    <article class="fuente">
+      <a href="https://content.arduino.cc/assets/Pinout-UNOrev3_latest.pdf" target="_blank" rel="noopener noreferrer">Diagrama de pines PDF ↗</a>
+      <p>Referencia visual de los pines de Arduino UNO Rev3.</p>
+    </article>
+    <article class="fuente">
+      <a href="https://docs.arduino.cc/language-reference/" target="_blank" rel="noopener noreferrer">Referencia del lenguaje ↗</a>
+      <p>Funciones y sintaxis del lenguaje Arduino.</p>
+    </article>
+  </div>
+  <p>Las imágenes requieren conexión a Internet. Los límites eléctricos dependen de la placa y del módulo utilizado: verifica siempre sus especificaciones.</p>
+</section>
+</main>
+
+<footer>
+  <div class="contenedor">
+    ARDUINO LAB_ · Guía educativa independiente.
+    <span class="naranja">Aprende, conecta y experimenta.</span><br>
+    Precaución: no cortocircuites la alimentación ni conectes motores directamente a los pines.
+  </div>
+</footer>
+
+<script>
+const componentes = [
+  {
+    id:"mcu", icono:"🧠", nombre:"Microcontrolador ATmega328P", categoria:"control",
+    resumen:"El cerebro de la placa.",
+    descripcion:"Ejecuta el programa que cargas en Arduino y procesa las entradas para controlar las salidas.",
+    puntos:["Guarda y ejecuta el sketch.","Lee sensores y botones.","Controla LEDs, zumbadores y módulos compatibles."],
+    consejo:"Piensa en él como un pequeño ordenador dedicado al control de circuitos."
+  },
+  {
+    id:"usb", icono:"🔌", nombre:"Conector USB tipo B", categoria:"conexiones",
+    resumen:"Programa y comunica la placa.",
+    descripcion:"Conecta Arduino con la computadora para cargar programas, intercambiar datos serie y alimentar la placa.",
+    puntos:["Utiliza un cable USB que transmita datos.","Selecciona la placa y el puerto correctos en Arduino IDE.","La conexión también permite comunicación con el Monitor Serie."],
+    consejo:"Si no detecta la placa, prueba un cable de datos diferente."
+  },
+  {
+    id:"power", icono:"⚡", nombre:"Conector de alimentación", categoria:"energia",
+    resumen:"Entrada para fuente externa.",
+    descripcion:"Permite alimentar la placa mediante un adaptador compatible cuando no se utiliza la alimentación USB.",
+    puntos:["El rango recomendado de entrada suele ser 7–12 V.","El límite publicado de entrada es 6–20 V; no es el rango recomendado.","Verifica la polaridad y las especificaciones de tu placa."],
+    consejo:"Para empezar, la alimentación por USB suele ser la opción más sencilla."
+  },
+  {
+    id:"reset", icono:"↻", nombre:"Botón RESET", categoria:"control",
+    resumen:"Reinicia el programa.",
+    descripcion:"Reinicia el microcontrolador para que el programa vuelva a comenzar desde setup().",
+    puntos:["No borra el programa cargado.","Es útil para reiniciar una práctica.","También hay un pin RESET en la hilera de conexiones."],
+    consejo:"Si quieres volver a iniciar tu programa, pulsa RESET."
+  },
+  {
+    id:"digital", icono:"↔", nombre:"Pines digitales 0–13", categoria:"conexiones",
+    resumen:"Leen y escriben estados digitales.",
+    descripcion:"Pueden configurarse como entradas o salidas digitales. Trabajan con estados lógicos HIGH y LOW.",
+    puntos:["pinMode() configura el pin.","digitalRead() lee una entrada.","digitalWrite() establece una salida.","Los pines 0 y 1 se comparten con la comunicación serie."],
+    consejo:"Para un LED externo, utiliza una resistencia limitadora."
+  },
+  {
+    id:"analog", icono:"〰", nombre:"Entradas analógicas A0–A5", categoria:"conexiones",
+    resumen:"Miden señales analógicas.",
+    descripcion:"El convertidor analógico-digital de la placa convierte el voltaje de entrada en una lectura numérica.",
+    puntos:["Se leen mediante analogRead().","En UNO R3 normalmente devuelve valores de 0 a 1023.","Son útiles para potenciómetros y sensores analógicos compatibles."],
+    consejo:"Nunca apliques a una entrada un voltaje superior al permitido."
+  },
+  {
+    id:"powerpins", icono:"🔋", nombre:"5V, 3.3V, GND y VIN", categoria:"energia",
+    resumen:"Alimentación y referencia eléctrica.",
+    descripcion:"Estos pines permiten alimentar módulos compatibles, establecer tierra común y conectar una entrada de alimentación adecuada.",
+    puntos:["GND es la referencia común del circuito.","5V y 3.3V tienen límites de corriente.","VIN se usa con una fuente externa apropiada."],
+    consejo:"Evita cortocircuitar 5V con GND y revisa los requisitos del módulo."
+  },
+  {
+    id:"pwm", icono:"〽", nombre:"Salidas PWM", categoria:"conexiones",
+    resumen:"Modulan una señal digital.",
+    descripcion:"PWM varía el ciclo de trabajo de una señal digital. Puede utilizarse para regular el brillo de un LED o controlar drivers compatibles.",
+    puntos:["Pines PWM del UNO R3: 3, 5, 6, 9, 10 y 11.","Se utiliza analogWrite() en los pines compatibles.","PWM no es una salida analógica continua."],
+    consejo:"No alimentes un motor directamente desde un pin; utiliza un controlador."
+  },
+  {
+    id:"icsp", icono:"▦", nombre:"Conector ICSP / SPI", categoria:"comunicacion",
+    resumen:"Programación y comunicación SPI.",
+    descripcion:"El conector expone señales utilizadas para programación en circuito y comunicación SPI.",
+    puntos:["Incluye señales SPI, alimentación, tierra y reset.","Puede utilizarse con herramientas compatibles.","Consulta el pinout antes de conectar un módulo."],
+    consejo:"Comprueba la orientación del conector y las conexiones antes de alimentar."
+  },
+  {
+    id:"leds", icono:"💡", nombre:"LEDs indicadores", categoria:"indicadores",
+    resumen:"Muestran actividad de la placa.",
+    descripcion:"Los LEDs ayudan a identificar el estado de alimentación y la actividad de comunicación. El LED L suele estar asociado al pin 13.",
+    puntos:["ON indica que la placa recibe alimentación.","TX y RX pueden parpadear durante comunicación serie.","LED_BUILTIN permite utilizar el LED integrado en ejemplos."],
+    consejo:"El LED integrado es ideal para tu primera práctica."
+  },
+  {
+    id:"crystal", icono:"⏱", nombre:"Reloj de 16 MHz", categoria:"control",
+    resumen:"Marca el ritmo de ejecución.",
+    descripcion:"El circuito de reloj proporciona una referencia temporal al microcontrolador.",
+    puntos:["La frecuencia del UNO R3 es 16 MHz.","Ayuda a coordinar temporizadores y comunicación.","No es una memoria ni un sensor."],
+    consejo:"Funciones como delay() y millis() se relacionan con el sistema de temporización."
+  },
+  {
+    id:"uart", icono:"⇄", nombre:"Comunicación serie UART", categoria:"comunicacion",
+    resumen:"Intercambia datos con otros dispositivos.",
+    descripcion:"La comunicación serie permite enviar y recibir datos mediante las líneas RX y TX.",
+    puntos:["RX recibe datos y TX transmite datos.","Serial.begin(9600) configura una velocidad de ejemplo.","El uso externo de los pines 0 y 1 puede afectar la carga del programa."],
+    consejo:"Configura el Monitor Serie a la misma velocidad que uses en Serial.begin()."
+  }
+];
+
+const botonesPlaca = document.getElementById("botonesPlaca");
+const detalle = document.getElementById("detalle");
+const lista = document.getElementById("listaComponentes");
+
+function mostrarDetalle(id) {
+  const c = componentes.find(item => item.id === id);
+  if (!c) return;
+
+  detalle.innerHTML = `
+    <div class="etiqueta">${c.categoria} · Componente seleccionado</div>
+    <h3>${c.nombre}</h3>
+    <p>${c.descripcion}</p>
+    <ul>${c.puntos.map(p => `<li>${p}</li>`).join("")}</ul>
+    <div class="aviso">${c.consejo}</div>
+  `;
+
+  document.querySelectorAll(".chip").forEach(b => {
+    b.classList.toggle("activa", b.dataset.id === id);
+  });
+
+  document.querySelectorAll(".tarjeta").forEach(b => {
+    b.classList.toggle("activa", b.dataset.id === id);
+  });
+}
+
+function crearBotonesPlaca() {
+  botonesPlaca.innerHTML = componentes.map(c =>
+    `<button class="chip" data-id="${c.id}">${c.nombre}</button>`
+  ).join("");
+
+  botonesPlaca.querySelectorAll("button").forEach(b => {
+    b.addEventListener("click", () => mostrarDetalle(b.dataset.id));
+  });
+}
+
+function dibujarComponentes() {
+  const consulta = document.getElementById("buscar").value.toLowerCase().trim();
+  const categoria = document.getElementById("filtro").value;
+
+  const filtrados = componentes.filter(c => {
+    const coincideCategoria = categoria === "todos" || c.categoria === categoria;
+    const coincideTexto = (c.nombre + " " + c.resumen + " " + c.descripcion)
+      .toLowerCase().includes(consulta);
+
+    return coincideCategoria && coincideTexto;
+  });
+
+  lista.innerHTML = filtrados.length
+    ? filtrados.map(c => `
+      <button class="tarjeta" data-id="${c.id}">
+        <div class="simbolo">${c.icono}</div>
+        <h3>${c.nombre}</h3>
+        <p>${c.resumen}</p>
+      </button>
+    `).join("")
+    : "<p>No se encontraron componentes con esa búsqueda.</p>";
+
+  lista.querySelectorAll("[data-id]").forEach(b => {
+    b.addEventListener("click", () => {
+      mostrarDetalle(b.dataset.id);
+      document.getElementById("explorador").scrollIntoView({behavior:"smooth"});
+    });
+  });
+}
+
+crearBotonesPlaca();
+dibujarComponentes();
+mostrarDetalle("mcu");
+
+document.getElementById("buscar").addEventListener("input", dibujarComponentes);
+document.getElementById("filtro").addEventListener("change", dibujarComponentes);
+
+document.querySelectorAll("[data-copiar]").forEach(b => {
+  b.addEventListener("click", async () => {
+    const texto = document.getElementById(b.dataset.copiar).innerText;
+
+    try {
+      await navigator.clipboard.writeText(texto);
+      b.textContent = "¡Copiado!";
+      setTimeout(() => b.textContent = "Copiar código", 1600);
+    } catch {
+      const seleccion = document.createRange();
+      seleccion.selectNodeContents(document.getElementById(b.dataset.copiar));
+      const rango = window.getSelection();
+      rango.removeAllRanges();
+      rango.addRange(seleccion);
+      b.textContent = "Selecciona y copia";
+    }
+  });
+});
+
+document.getElementById("quiz").addEventListener("submit", e => {
+  e.preventDefault();
+  const respuesta = new FormData(e.target).get("respuesta");
+  const resultado = document.getElementById("resultado");
+
+  if (!respuesta) {
+    resultado.textContent = "Selecciona una respuesta primero.";
+    resultado.style.color = "var(--naranja)";
+  } else if (respuesta === "b") {
+    resultado.textContent = "¡Correcto! El microcontrolador ejecuta el programa y procesa las entradas.";
+    resultado.style.color = "var(--verde)";
+  } else {
+    resultado.textContent = "Inténtalo de nuevo. Revisa la sección del microcontrolador.";
+    resultado.style.color = "var(--naranja)";
+  }
+});
+</script>
 </body>
 </html>
